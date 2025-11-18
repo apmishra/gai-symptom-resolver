@@ -1,0 +1,5 @@
+{
+  "name": "Symptom Insight AI",
+  "description": "An AI-powered assistant to help you understand medical reports and symptoms. Upload a PDF or paste text to identify potential symptoms, explore possible reasons, and discover a range of solutions with sourced information. This is not a substitute for professional medical advice.",
+  "requestFramePermissions": []
+}
