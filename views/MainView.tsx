@@ -1,63 +1,50 @@
-
-import React, { useState, useCallback } from 'react';
-import type { AppStep, ConfirmedSymptom, DebugLog, AnalysisResults } from '../types';
-import { extractSymptomsFromText, getAnalysis } from '../services/geminiService';
+import React, { useState, useEffect, useCallback } from 'react';
+import type { AnalysisSession, AnalysisTab, ConfirmedSymptom, DebugLog } from '../types';
 import Step1Input from '../components/Step1_Input';
 import Step2SymptomConfirmation from '../components/Step2_SymptomConfirmation';
 import Step3Results from '../components/Step3_Results';
+import StepIndicator from '../components/StepIndicator';
 
 interface MainViewProps {
+  session: AnalysisSession;
   apiKey: string;
   addLog: (log: Omit<DebugLog, 'id' | 'timestamp'>) => void;
+  onTextSubmit: (text: string) => void;
+  onAnalysisRequest: (symptoms: string[]) => void;
+  onStartNew: () => void;
+  isLoading: boolean;
+  error: string | null;
+  clearError: () => void;
 }
 
-const MainView: React.FC<MainViewProps> = ({ apiKey, addLog }) => {
-  const [step, setStep] = useState<AppStep>('input');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+const MainView: React.FC<MainViewProps> = ({
+  session,
+  apiKey,
+  addLog,
+  onTextSubmit,
+  onAnalysisRequest,
+  onStartNew,
+  isLoading,
+  error,
+  clearError,
+}) => {
+  const [activeTab, setActiveTab] = useState<AnalysisTab>('input');
 
-  const [extractedText, setExtractedText] = useState<string>('');
-  const [suggestedSymptoms, setSuggestedSymptoms] = useState<ConfirmedSymptom[]>([]);
-  const [analysisResults, setAnalysisResults] = useState<AnalysisResults | null>(null);
+  useEffect(() => {
+    // Sync active tab with session status
+    if (session.status === 'complete') {
+        setActiveTab('results');
+    } else if (session.status === 'confirmation') {
+        setActiveTab('confirmation');
+    } else {
+        setActiveTab('input');
+    }
+  }, [session.status]);
 
   const handleReset = useCallback(() => {
-    setStep('input');
-    setIsLoading(false);
-    setError(null);
-    setExtractedText('');
-    setSuggestedSymptoms([]);
-    setAnalysisResults(null);
-    addLog({type:'info', message:'Workflow reset by user.'})
-  }, [addLog]);
-
-  const handleTextSubmit = useCallback(async (text: string) => {
-    setIsLoading(true);
-    setError(null);
-    setExtractedText(text);
-    try {
-      const symptoms = await extractSymptomsFromText(apiKey, text, addLog);
-      setSuggestedSymptoms(symptoms.map(s => ({ ...s, confirmed: true })));
-      setStep('confirmation');
-    } catch (e) {
-      setError('Failed to extract symptoms. Please check the debug log for more details.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [apiKey, addLog]);
-
-  const handleAnalysisRequest = useCallback(async (finalSymptoms: string[]) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-        const results = await getAnalysis(apiKey, finalSymptoms, addLog);
-        setAnalysisResults(results);
-        setStep('results');
-    } catch(e) {
-        setError('Failed to get analysis. Please check the debug log for more details.');
-    } finally {
-        setIsLoading(false);
-    }
-  }, [apiKey, addLog]);
+    clearError();
+    onStartNew();
+  }, [clearError, onStartNew]);
 
 
   const renderContent = () => {
@@ -86,28 +73,37 @@ const MainView: React.FC<MainViewProps> = ({ apiKey, addLog }) => {
         )
     }
 
-    switch (step) {
+    switch (activeTab) {
       case 'input':
-        return <Step1Input onTextSubmit={handleTextSubmit} />;
+        return <Step1Input onTextSubmit={onTextSubmit} initialText={session.inputText} />;
       case 'confirmation':
         return <Step2SymptomConfirmation 
-                  symptoms={suggestedSymptoms} 
-                  onConfirm={handleAnalysisRequest}
-                  onBack={handleReset}
+                  symptoms={session.suggestedSymptoms} 
+                  onConfirm={onAnalysisRequest}
                />;
       case 'results':
         return <Step3Results 
-                  results={analysisResults!}
+                  results={session.analysisResults!}
                   apiKey={apiKey}
                   addLog={addLog}
-                  onReset={handleReset}
                />;
       default:
         return <div>Invalid step</div>;
     }
   };
 
-  return <div className="p-4">{renderContent()}</div>;
+  return (
+    <div className="p-4">
+        <header className="mb-4">
+            <h1 className="text-xl font-bold text-text-primary truncate">{session.name}</h1>
+            <p className="text-sm text-text-secondary">Session ID: {session.id}</p>
+        </header>
+        <StepIndicator currentTab={activeTab} setTab={setActiveTab} sessionStatus={session.status} />
+        <div className="mt-4">
+            {renderContent()}
+        </div>
+    </div>
+  );
 };
 
 export default MainView;

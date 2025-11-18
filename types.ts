@@ -1,4 +1,3 @@
-
 export interface Symptom {
   name: string;
   explanation: string;
@@ -45,6 +44,17 @@ export interface DebugLog {
   data?: any;
 }
 
-export type AppView = 'main' | 'settings' | 'debug';
+export type AppView = 'main' | 'settings' | 'debug' | 'history';
 
-export type AppStep = 'input' | 'confirmation' | 'results';
+export type AnalysisTab = 'input' | 'confirmation' | 'results';
+export type SessionStatus = 'input' | 'confirmation' | 'complete';
+
+export interface AnalysisSession {
+  id: string;
+  name: string;
+  createdAt: string;
+  status: SessionStatus;
+  inputText: string;
+  suggestedSymptoms: ConfirmedSymptom[];
+  analysisResults: AnalysisResults | null;
+}

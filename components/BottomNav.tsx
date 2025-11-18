@@ -1,4 +1,3 @@
-
 import React from 'react';
 import type { AppView } from '../types';
 
@@ -9,8 +8,14 @@ interface BottomNavProps {
 
 const HomeIcon = ({ active }: { active: boolean }) => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={active ? "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" : "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"} />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
   </svg>
+);
+
+const HistoryIcon = ({ active }: { active: boolean }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
 );
 
 const SettingsIcon = ({ active }: { active: boolean }) => (
@@ -49,6 +54,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ currentView, setView }) => {
     <div className="fixed bottom-0 left-0 right-0 h-20 bg-white/80 backdrop-blur-sm border-t border-gray-200 shadow-t-sm z-40 max-w-md mx-auto">
       <div className="flex justify-around items-center h-full px-2">
         <NavItem label="Home" icon={<HomeIcon active={currentView === 'main'} />} isActive={currentView === 'main'} onClick={() => setView('main')} />
+        <NavItem label="History" icon={<HistoryIcon active={currentView === 'history'} />} isActive={currentView === 'history'} onClick={() => setView('history')} />
         <NavItem label="Settings" icon={<SettingsIcon active={currentView === 'settings'} />} isActive={currentView === 'settings'} onClick={() => setView('settings')} />
         <NavItem label="Debug" icon={<DebugIcon active={currentView === 'debug'} />} isActive={currentView === 'debug'} onClick={() => setView('debug')} />
       </div>

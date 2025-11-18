@@ -1,11 +1,9 @@
-
 import React, { useState, useMemo } from 'react';
 import type { ConfirmedSymptom } from '../types';
 
 interface Step2SymptomConfirmationProps {
   symptoms: ConfirmedSymptom[];
   onConfirm: (symptoms: string[]) => void;
-  onBack: () => void;
 }
 
 const SymptomCard: React.FC<{ symptom: ConfirmedSymptom, onToggle: (name: string) => void }> = ({ symptom, onToggle }) => (
@@ -26,7 +24,7 @@ const SymptomCard: React.FC<{ symptom: ConfirmedSymptom, onToggle: (name: string
     </div>
 );
 
-const Step2SymptomConfirmation: React.FC<Step2SymptomConfirmationProps> = ({ symptoms: initialSymptoms, onConfirm, onBack }) => {
+const Step2SymptomConfirmation: React.FC<Step2SymptomConfirmationProps> = ({ symptoms: initialSymptoms, onConfirm }) => {
   const [symptoms, setSymptoms] = useState<ConfirmedSymptom[]>(initialSymptoms);
   const [additionalSymptoms, setAdditionalSymptoms] = useState('');
 
@@ -55,8 +53,7 @@ const Step2SymptomConfirmation: React.FC<Step2SymptomConfirmationProps> = ({ sym
 
   return (
     <div>
-        <button onClick={onBack} className="text-primary mb-4 text-sm">&larr; Back to Input</button>
-        <h1 className="text-3xl font-bold text-text-primary mb-2">Confirm Symptoms</h1>
+        <h2 className="text-2xl font-bold text-text-primary mb-2">Confirm Symptoms</h2>
         <p className="text-text-secondary mb-6">
             The AI found the following potential symptoms. Please review and confirm them. You can also add any other symptoms you're experiencing.
         </p>
@@ -78,7 +75,7 @@ const Step2SymptomConfirmation: React.FC<Step2SymptomConfirmationProps> = ({ sym
             />
         </div>
 
-        <div className="mt-6 sticky bottom-24 p-2 bg-background/80 backdrop-blur-sm rounded-lg">
+        <div className="mt-6">
              <button
                 onClick={handleSubmit}
                 className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-opacity-90 transition-colors disabled:opacity-50"

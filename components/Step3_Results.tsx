@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import type { AnalysisResults, DebugLog, Solution } from '../types';
 import { querySource } from '../services/geminiService';
 
@@ -112,23 +112,30 @@ interface Step3ResultsProps {
     results: AnalysisResults;
     apiKey: string;
     addLog: (log: Omit<DebugLog, 'id' | 'timestamp'>) => void;
-    onReset: () => void;
 }
 
-const Step3Results: React.FC<Step3ResultsProps> = ({ results, apiKey, addLog, onReset }) => {
+const Step3Results: React.FC<Step3ResultsProps> = ({ results, apiKey, addLog }) => {
+  if (!results) {
+    return (
+        <div className="text-center p-8">
+            <h2 className="text-xl font-semibold text-text-secondary">No Results Yet</h2>
+            <p className="text-text-secondary mt-2">Complete the previous steps to see your analysis.</p>
+        </div>
+    )
+  }
   return (
     <div>
         <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-text-primary mb-2">Analysis Complete</h1>
+            <h2 className="text-2xl font-bold text-text-primary mb-2">Analysis Complete</h2>
             <p className="text-text-secondary">Here's a summary of potential reasons and solutions based on your symptoms.</p>
         </div>
 
         <div className="mb-8">
-            <h2 className="text-2xl font-bold text-text-primary mb-4 border-b pb-2">Potential Reasons</h2>
+            <h3 className="text-2xl font-bold text-text-primary mb-4 border-b pb-2">Potential Reasons</h3>
             <div className="space-y-4">
                 {results.potentialReasons.map(reason => (
                     <div key={reason.name} className="bg-card p-4 rounded-lg shadow-sm">
-                        <h3 className="font-semibold text-lg text-text-primary">{reason.name}</h3>
+                        <h4 className="font-semibold text-lg text-text-primary">{reason.name}</h4>
                         <p className="text-text-secondary mt-1 whitespace-pre-wrap">{reason.description}</p>
                     </div>
                 ))}
@@ -136,7 +143,7 @@ const Step3Results: React.FC<Step3ResultsProps> = ({ results, apiKey, addLog, on
         </div>
 
         <div>
-            <h2 className="text-2xl font-bold text-text-primary mb-4 border-b pb-2">Suggested Solutions</h2>
+            <h3 className="text-2xl font-bold text-text-primary mb-4 border-b pb-2">Suggested Solutions</h3>
              <div className="mt-2 mb-6 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
                 <p><strong className="font-bold">Important:</strong> Always consult a healthcare professional before trying any new treatment or remedy. This information is for educational purposes only.</p>
             </div>
@@ -144,13 +151,6 @@ const Step3Results: React.FC<Step3ResultsProps> = ({ results, apiKey, addLog, on
                 <SolutionCategory key={category} title={category} solutions={solutions} apiKey={apiKey} addLog={addLog} />
             ))}
         </div>
-
-        <button 
-            onClick={onReset}
-            className="w-full mt-8 bg-secondary text-white font-bold py-3 px-4 rounded-lg hover:bg-opacity-90 transition-colors"
-        >
-            Start New Analysis
-        </button>
     </div>
   );
 };

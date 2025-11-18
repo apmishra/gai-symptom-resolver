@@ -1,9 +1,9 @@
-
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { extractTextFromPdf } from '../services/pdfParser';
 
 interface Step1InputProps {
   onTextSubmit: (text: string) => void;
+  initialText: string;
 }
 
 const UploadIcon = () => (
@@ -12,10 +12,14 @@ const UploadIcon = () => (
     </svg>
 )
 
-const Step1Input: React.FC<Step1InputProps> = ({ onTextSubmit }) => {
-  const [text, setText] = useState('');
+const Step1Input: React.FC<Step1InputProps> = ({ onTextSubmit, initialText }) => {
+  const [text, setText] = useState(initialText);
   const [fileName, setFileName] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setText(initialText);
+  }, [initialText])
 
   const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -46,7 +50,7 @@ const Step1Input: React.FC<Step1InputProps> = ({ onTextSubmit }) => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-text-primary mb-2">Symptom Insight AI</h1>
+      <h2 className="text-2xl font-bold text-text-primary mb-2">Provide Medical Data</h2>
       <p className="text-text-secondary mb-6">Upload a medical document or paste the text below to begin.</p>
       
       {error && <p className="text-danger mb-4">{error}</p>}
@@ -78,7 +82,7 @@ const Step1Input: React.FC<Step1InputProps> = ({ onTextSubmit }) => {
         className="w-full bg-primary text-white font-bold py-3 px-4 rounded-lg hover:bg-opacity-90 transition-colors disabled:opacity-50"
         disabled={!text.trim()}
       >
-        Analyze Text
+        Analyze Text & Extract Symptoms
       </button>
 
       <div className="mt-6 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
